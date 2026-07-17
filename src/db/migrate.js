@@ -1,6 +1,7 @@
 import pool from './index.js'
+import { fileURLToPath } from 'node:url'
 
-async function migrate() {
+export async function migrate(closePool = false) {
   const create = `
   CREATE TABLE IF NOT EXISTS journals (
     id SERIAL PRIMARY KEY,
@@ -20,8 +21,12 @@ async function migrate() {
     console.error('Migration failed:', err)
     process.exit(1)
   } finally {
-    await pool.end()
+    if (closePool) {
+      await pool.end()
+    }
   }
 }
 
-migrate()
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  migrate(true)
+}

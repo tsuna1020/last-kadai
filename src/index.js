@@ -3,6 +3,7 @@ import http from 'node:http'
 import { Client, GatewayIntentBits, REST, Routes } from 'discord.js'
 import pool from './db/index.js'
 import { summarizeEntry, generateTags, generateWeeklyReport } from './ai/gemini.js'
+import { migrate } from './db/migrate.js'
 
 dotenv.config()
 
@@ -155,8 +156,6 @@ client.on('messageCreate', async (message) => {
   }
 })
 
-client.login(process.env.DISCORD_TOKEN)
-
 const port = process.env.PORT || 3000
 const server = http.createServer((req, res) => {
   if (req.method === 'GET' && req.url === '/') {
@@ -173,6 +172,20 @@ const server = http.createServer((req, res) => {
   res.end('Not Found')
 })
 
-server.listen(port, () => {
-  console.log(`Server listening on port ${port}`)
-})
+async function startApp() {
+  try {
+    await migrate(false)
+    console.log('Database migration completed before startup.')
+  } catch (err) {
+    console.error('Startup migration failed:', err)
+    process.exit(1)
+  }
+
+  await client.login(process.env.DISCORD_TOKEN)
+
+  server.listen(port, () => {
+    console.log(`Server listening on port ${port}`)
+  })
+}
+
+startApp()
