@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    container_name: hellodbapp
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+
+  postgres:
+    image: postgres:17
+    container_name: hellodb
+    environment:
+      POSTGRES_USER: hellodb
+      POSTGRES_PASSWORD: myPostgres
+      POSTGRES_DB: hellodb
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ne337777@senshu-u.jp
+      PGADMIN_DEFAULT_PASSWORD: nn123mm
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres:

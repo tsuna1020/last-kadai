@@ -1,0 +1,13 @@
+{
+  "name": "hellodb",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "type": "module",
+  "dependencies": {
+    "sequelize": "^6.32.1",
+    "pg": "^8.11.0"
+  }
+}
