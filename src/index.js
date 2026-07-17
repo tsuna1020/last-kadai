@@ -106,16 +106,7 @@ client.on('interactionCreate', async (interaction) => {
 // --- 自動検知ハンドラ ---
 function shouldRecordMessage(text) {
   if (!text || text.length < 5) return false
-  const lower = text.toLowerCase()
-  const errorKeywords = /(error|エラー|exception|failed|失敗|ハマっ|直っ|stack|stacktrace|trace|crash|panic)/i
-  const codeFence = /```[\s\S]*?```/m
-  const inlineCode = /`[^`]+`/m
-  const techHints = /(npm|pip|docker|postgres|psql|sequelize|python|javascript|node|react|next|sql|bash)/i
-
-  if (codeFence.test(text) || inlineCode.test(text)) return true
-  if (errorKeywords.test(text)) return true
-  if (techHints.test(text) && text.length < 500) return true
-  return false
+  return true
 }
 
 function extractTags(text) {
@@ -136,10 +127,21 @@ function normalizeTag(tag) {
 client.on('messageCreate', async (message) => {
   try {
     if (message.author?.bot) return
-    if (!message.guild) return // only guild messages
+    if (!message.guild) {
+      console.log('Skipping non-guild message because journal records are limited to guild channels.')
+      return
+    }
 
     const content = message.content || ''
-    if (!shouldRecordMessage(content)) return
+    if (!content) {
+      console.warn('Received a message with empty content. Confirm MESSAGE_CONTENT intent is enabled in Discord developer settings.')
+      return
+    }
+
+    if (!shouldRecordMessage(content)) {
+      console.log('Skipping message because it did not match the current recording filter:', content.slice(0, 100))
+      return
+    }
 
     const summary = content.length > 280 ? content.slice(0, 277) + '...' : content
     const aiTags = await generateTags(content)
