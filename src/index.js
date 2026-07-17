@@ -49,7 +49,7 @@ client.on('interactionCreate', async (interaction) => {
   const { commandName } = interaction
 
   if (commandName === 'help') {
-    await interaction.reply({ content: 'このボットは学習ログを自動で収集し、`/search` と `/report` で活用できます。' })
+    await interaction.reply({ content: 'このボットはチャットにつぶやいた日々の発見や記録を生成AIが自動で収集します。また、/searchで過去の記録にキーワード検索を行うことができ、/reportで週間レポートを生成できます。' })
   }
 
   if (commandName === 'search') {
