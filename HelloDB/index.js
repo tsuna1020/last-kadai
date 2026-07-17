@@ -1,8 +1,17 @@
+import dotenv from 'dotenv'
 import { Sequelize, DataTypes } from 'sequelize'
 
-const DB_INFO = 'postgres://hellodb:myPostgres@postgres:5432/hellodb'
+dotenv.config()
 
-const sequelize = new Sequelize(DB_INFO, { dialect: 'postgres', logging: false })
+const dbConnectionString = process.env.DATABASE_URL || 'postgres://hellodb:myPostgres@postgres:5432/hellodb'
+
+const sequelize = new Sequelize(dbConnectionString, {
+  dialect: 'postgres',
+  logging: false,
+  dialectOptions: process.env.DATABASE_URL
+    ? { ssl: { require: true, rejectUnauthorized: false } }
+    : {}
+})
 
 const Messages = sequelize.define(
   'messages',
